@@ -32,18 +32,12 @@ router.post("/create", (req, res) => {
     location,
     price,
   };
-  
-  // const newAd = new AdService().create(ad);
 
-  // if (newAd) {
-  //   res.send({ message: `Nouvelle categorie ajoutée à l'id:${newAd}` });
-  // }
-
-  try{
+  try {
     const newAd = new AdService().create(ad);
-    res.status(201).send({success:true, ad:newAd})
-  } catch(err:any){
-    res.status(500).send({success:false, errorMessage: err.message})
+    res.status(201).send({ success: true, ad: newAd });
+  } catch (err: any) {
+    res.status(500).send({ success: false, errorMessage: err.message });
   }
 });
 export default router;
