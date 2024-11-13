@@ -1,36 +1,49 @@
 import { Router } from "express";
+import AdService from "../services/ad.service";
 import { Ad } from "../types/ads";
 
 const router = Router();
 
-const adsList: Ad[] = [
-  {
-    id: "1",
-    title: "Mon super titre 1",
-    description: "Ma super description 1",
-    price: 20.0,
-    picture: "",
-    location: "Paris",
-  },
-  {
-    id: "2",
-    title: "Mon super titre 2",
-    description: "Ma super description 2",
-    price: 30.0,
-    picture: "",
-    location: "Toulouse",
-  },
-];
-
 router.get("/list", (req, res) => {
   // router.get("/ads/list", (req, res) => {
+  const adsList = new AdService().listAds();
   res.send(adsList);
 });
 
 router.get("/find/:id", (req, res) => {
-  // router.get("/ads/find/:id", (req, res) => {
-  // http://localhost:4000/ads/find/123456789 // variable de chemin (path variable)
-  //http://localhost:4000/ads/find?id=123456789 // query variable
+  const { id } = req.params;
+  try {
+    const ad = new AdService().findAdById(id);
+    res.send(ad);
+  } catch (err: any) {
+    res.status(404).send({ message: err.message });
+  }
 });
 
+//express validator
+router.post("/create", (req, res) => {
+  const { id, title, description, picture, location, price }: Ad = req.body;
+
+  const ad = {
+    id,
+    title,
+    description,
+    picture,
+    location,
+    price,
+  };
+  
+  // const newAd = new AdService().create(ad);
+
+  // if (newAd) {
+  //   res.send({ message: `Nouvelle categorie ajoutée à l'id:${newAd}` });
+  // }
+
+  try{
+    const newAd = new AdService().create(ad);
+    res.status(201).send({success:true, ad:newAd})
+  } catch(err:any){
+    res.status(500).send({success:false, errorMessage: err.message})
+  }
+});
 export default router;
