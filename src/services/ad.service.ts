@@ -1,26 +1,10 @@
-import { Ad, PartialAdWithoutId } from "../types/ads.d";
+import { Ad, AdCreate, AdWithoutId, PartialAdWithoutId } from "../types/ads.d";
 import sqlite3 from "sqlite3";
 
-let adsList: Ad[] = [
-  {
-    id: "1",
-    title: "Mon super titre 1",
-    description: "Ma super description 1",
-    price: 20.0,
-    picture: "",
-    location: "Paris",
-  },
-  {
-    id: "2",
-    title: "Mon super titre 2",
-    description: "Ma super description 2",
-    price: 30.0,
-    picture: "",
-    location: "Toulouse",
-  },
-];
+
 export default class AdService {
   db: sqlite3.Database;
+  maValeur = "toto";
 
   //cours aujourd'hui sur la POO ;😅
   constructor() {
@@ -59,7 +43,7 @@ export default class AdService {
     });
   }
 
-  create(ad: Ad) {
+  create(ad: AdCreate<Ad>) {
     return new Promise<Ad>((resolve, reject) => {
       this.db.run(
         "INSERT INTO ads (title, description, price, picture, location) VALUES (?, ?, ?, ?, ?)",
@@ -144,3 +128,4 @@ export default class AdService {
     // }
   }
 }
+const adService = new AdService();
