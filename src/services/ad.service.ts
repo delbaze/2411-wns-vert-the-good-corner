@@ -36,27 +36,42 @@ export default class AdService {
 
         resolve(rows);
       });
-
     });
   }
   findAdById(id: string) {
-    const ad = adsList.find((ad) => ad.id === id);
-    if (!ad) {
-      throw new Error("L'annonce n'existe pas");
-    }
-    return ad;
-  }
-  create(ad: Ad) {
-    const adExists = adsList.some((a) => a.id === ad.id);
-    if (adExists) {
-      throw new Error("L'annonce existe déjà");
-    }
+    return new Promise<Ad>((resolve, reject) => {
+      this.db.get<Ad>(
+        "SELECT * FROM ads WHERE id = ?",
+        [id],
+        (err: any, row) => {
+          if (err) {
+            reject(err.message);
+          }
 
-    adsList.push(ad);
-    return ad;
+          resolve(row);
+        }
+      );
+    });
   }
-  update(id: string, ad: Partial<PartialAdWithoutId>) {
-    const adFound = this.findAdById(id);
+
+  create(ad: Ad) {
+    return new Promise<Ad>((resolve, reject) => {
+      this.db.run(
+        "INSERT INTO ads (title, description, price, picture, location) VALUES (?, ?, ?, ?, ?)",
+        [ad.title, ad.description, ad.price, ad.picture, ad.location],
+        function (err: any) {
+          if (err) {
+            console.log("error", err);
+            reject(err);
+          } else {
+            resolve({ ...ad, id: `${this.lastID}` });
+          }
+        }
+      );
+    });
+  }
+  async update(id: string, ad: Partial<PartialAdWithoutId>) {
+    const adFound = await this.findAdById(id);
 
     Object.keys(ad).forEach((k) => {
       //title, description, picture, location, price
@@ -70,11 +85,27 @@ export default class AdService {
 
     return adFound;
   }
-  delete(id: string) {
-    const ad = this.findAdById(id);
-    adsList = adsList.filter((a) => a.id !== ad.id);
+  async delete(id: string) {
+    return new Promise<string>(async (resolve, reject) => {
+      // const ad = await this.findAdById(id);
+      this.db.run("DELETE FROM ads WHERE id = ?", [id], async function (error) {
+        if (error) {
+          reject(error);
+        } else {
+          if (this.changes === 0) {
+            reject("L'annonce n'existe pas");
+          }
+          console.log("CHANGES", this.changes);
 
-    return ad.id;
+          resolve(id);
+        }
+      });
+    });
+
+    // const ad = await this.findAdById(id);
+    // adsList = adsList.filter((a) => a.id !== ad.id);
+
+    // return ad.id;
     // const adIndex = adsList.findIndex((ad) => ad.id === id);
     // if (adIndex === -1) {
     //   throw new Error("Ad not found");
