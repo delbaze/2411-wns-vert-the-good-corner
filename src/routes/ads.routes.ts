@@ -56,7 +56,7 @@ router.patch("/update/:id", async (req, res) => {
     res.send(adUpdate);
   } catch (err: any) {
     console.log('%c⧭', 'color: #00a3cc', err);
-    res.status(500).send({ success: false, errorMessage: err.message });
+    res.status(500).send({ success: false, errorMessage: err.message ?? err }); // opérateur de coalescence ?? ||
   }
 });
 

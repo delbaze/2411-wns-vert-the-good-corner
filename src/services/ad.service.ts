@@ -43,9 +43,14 @@ export default class AdService {
       this.db.get<Ad>(
         "SELECT * FROM ads WHERE id = ?",
         [id],
-        (err: any, row) => {
+        function (err: any, row) {
+          console.log("ROW", row);
+          console.log(err);
           if (err) {
             reject(err.message);
+          }
+          if (!row) {
+            reject("L'annonce n'existe pas");
           }
 
           resolve(row);
@@ -71,24 +76,47 @@ export default class AdService {
     });
   }
   async update(id: string, ad: Partial<PartialAdWithoutId>) {
-    const adFound = await this.findAdById(id);
+    return new Promise<Ad>(async (resolve, reject) => {
+      try {
+        const adFound = await this.findAdById(id);
+        Object.keys(ad).forEach((k) => {
+          //title, description, picture, location, price
+          if (ad[k]) {
+            // si title n'est pas undefined :  if ad.title
+            adFound[k] = ad[k]; // title de l'annonce trouvée est égal au titre reçu adFound.title = ad.title
+          }
+        });
 
-    Object.keys(ad).forEach((k) => {
-      //title, description, picture, location, price
-      if (ad[k]) {
-        // si title n'est pas undefined :  if ad.title
-        adFound[k] = ad[k]; // title de l'annonce trouvée est égal au titre reçu adFound.title = ad.title
+        this.db.run(
+          "UPDATE ads SET title = ?, description = ?, picture = ?, location = ?, price = ? WHERE id = ?",
+          [
+            adFound.title,
+            adFound.description,
+            adFound.picture,
+            adFound.location,
+            adFound.price,
+            id,
+          ],
+          function (err) {
+            if (err) {
+              reject("Il y a eu une erreur");
+            }
+            if (this.changes === 0) {
+              reject("L'annonce n'existe pas");
+            }
+
+            resolve(adFound);
+          }
+        );
+      } catch (err) {
+        reject(err);
       }
     });
-
-    console.log(adsList);
-
-    return adFound;
   }
   async delete(id: string) {
-    return new Promise<string>(async (resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       // const ad = await this.findAdById(id);
-      this.db.run("DELETE FROM ads WHERE id = ?", [id], async function (error) {
+      this.db.run("DELETE FROM ads WHERE id = ?", [id], function (error) {
         if (error) {
           reject(error);
         } else {
