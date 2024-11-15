@@ -127,4 +127,3 @@ export default class AdService {
     // }
   }
 }
-const adService = new AdService();
