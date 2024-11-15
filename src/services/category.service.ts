@@ -88,16 +88,20 @@ export default class CategoryService {
   }
   async delete(id: string) {
     return new Promise<string>((resolve, reject) => {
-      this.db.run("DELETE FROM categories WHERE id = ?", [id], function (error) {
-        if (error) {
-          reject(error);
-        } else {
-          if (this.changes === 0) {
-            reject("La catégorie n'existe pas");
+      this.db.run(
+        "DELETE FROM categories WHERE id = ?",
+        [id],
+        function (error) {
+          if (error) {
+            reject(error);
+          } else {
+            if (this.changes === 0) {
+              reject("La catégorie n'existe pas");
+            }
+            resolve(id);
           }
-          resolve(id);
         }
-      });
+      );
     });
   }
 }
