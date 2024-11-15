@@ -23,5 +23,8 @@ export type AdCreate<T extends object> = T & {
   picture: string;
   location: string;
   price: number;
+  categoryId: string;
 };
+
+
 export type PartialAdWithoutId = AdWithoutId<Partial<Omit<Ad, "id">>>;

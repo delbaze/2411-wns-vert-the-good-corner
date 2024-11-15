@@ -5,11 +5,10 @@ export type Category = {
 };
 
 export type CategoryWithoutId<T extends object> = T & {
-    [key: string]: string | number;
+    [key: string]: string;
     title?: string;
   };
 export type CategoryCreate<T extends object> = T & {
-  [key: string]: string;
   title: string;
 };
 

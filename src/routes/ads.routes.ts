@@ -1,3 +1,4 @@
+import { AdCreate } from './../types/ads.d';
 import { Router } from "express";
 import AdService from "../services/ad.service";
 import { Ad, PartialAdWithoutId } from "../types/ads";
@@ -25,7 +26,7 @@ router.get("/find/:id", async (req, res) => {
 
 //express validator
 router.post("/create", async (req, res) => {
-  const { id, title, description, picture, location, price }: Ad = req.body;
+  const { id, title, description, picture, location, price, categoryId }: AdCreate<Ad> = req.body;
 
   const ad = {
     id,
@@ -34,6 +35,7 @@ router.post("/create", async (req, res) => {
     picture,
     location,
     price,
+    categoryId
   };
 
   try {
@@ -55,7 +57,6 @@ router.patch("/update/:id", async (req, res) => {
     const adUpdate = await new AdService().update(id, ad);
     res.send(adUpdate);
   } catch (err: any) {
-    console.log('%c⧭', 'color: #00a3cc', err);
     res.status(500).send({ success: false, errorMessage: err.message ?? err }); // opérateur de coalescence ?? ||
   }
 });
