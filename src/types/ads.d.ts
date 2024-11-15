@@ -17,7 +17,6 @@ export type AdWithoutId<T extends object> = T & {
   price?: number;
 };
 export type AdCreate<T extends object> = T & {
-  [key: string]: string | number;
   title: string;
   description: string;
   picture: string;
