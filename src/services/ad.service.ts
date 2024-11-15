@@ -70,7 +70,6 @@ export default class AdService {
             adFound[k] = ad[k]; // title de l'annonce trouvée est égal au titre reçu adFound.title = ad.title
           }
         });
-
         this.db.run(
           "UPDATE ads SET title = ?, description = ?, picture = ?, location = ?, price = ? WHERE id = ?",
           [
